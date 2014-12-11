@@ -33,7 +33,7 @@
 
   var ContextMenuPage = PageObject.extend({
     isShown: function () {
-      return this.$('#context-menu').hasClass('in');
+      return this.$el.hasClass('in');
     }
   });
 
@@ -51,7 +51,7 @@
       return new ModalPage(this.$('#myModal'));
     },
     switchContextMenu: function () {
-      return new ContextMenuPage(this.$('#contextMenu'));
+      return new ContextMenuPage(this.$('#context-menu'));
     },
     switchProgress: function () {
       return new ProgressPage(this.$('#progressbar'));
