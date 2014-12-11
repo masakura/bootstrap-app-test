@@ -1,20 +1,12 @@
 (function () {
   'use strict';
 
-  var toArray = function(args) {
-    var array = new Array(args.length);
-    for (var i = 0; i < args.length; i++) {
-      array[i] = args[i];
-    }
-    return array;
-  };
-
   var emulateTransitionEnd = $.fn.emulateTransitionEnd;
   /*
-    $.fn.emulateTransitionEnd = function () {
+  $.fn.emulateTransitionEnd = function () {
     return emulateTransitionEnd.call(this, 0);
-    };
-  */
+  };
+   */
 
   var Queue = function () {
     this.count_ = 0;
@@ -75,8 +67,14 @@
   Waiter.prototype.promise = function () {
     var deferred = $.Deferred();
 
-    var args = toArray(arguments);
-    this.queue_.register(function () { deferred.resolve(args[0][0]); });
+    var makeResolve = function () {
+      var args = _.toArray(arguments);
+      args.unshift(deferred);
+      args.unshift(deferred.resolve);
+
+      return $.proxy.apply(null, args);
+    };
+    this.queue_.register(makeResolve.apply(null, arguments));
 
     return deferred.promise();
   };
@@ -89,14 +87,14 @@
     var types = ['bs.modal', 'bs.collapse'];
     var names = ['show', 'shown', 'hide', 'hidden'];
 
-    var events = new Array(names.length * types.length);
-    var index = 0;
-    for (var i = 0; i < types.length; i++) {
-      for (var j = 0; j < names.length; j++) {
-        events[index] = names[j] + '.' + types[i];
-        index++;
-      }
-    }
+    var makeEvents = function (type) {
+      return names.map(function (name) { return name + '.' + type; });
+    };
+
+    var events = _.chain(types)
+          .map(makeEvents)
+          .flatten()
+          .value();
 
     $(document).on(events.join(' '), '*', function (e) {
       console.log('{' + e.type + '}');
@@ -111,6 +109,7 @@
   };
 
   $.fn.promiseTransition = function () {
-    return $(this).data('promise.transition').promise(toArray(arguments));
+    var waiter = $(this).data('promise.transition');
+    return waiter.promise.apply(waiter, _.toArray(arguments));
   };
 })();
