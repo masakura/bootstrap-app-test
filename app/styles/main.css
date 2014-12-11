@@ -87,3 +87,9 @@ body {
     border-bottom: 0;
   }
 }
+
+.modal.fade .modal-dialog {
+  -webkit-transition: -webkit-transform 1s ease-out !important;
+       -o-transition:      -o-transform 1s ease-out !important;
+          transition:         transform 1s ease-out !important;
+}
