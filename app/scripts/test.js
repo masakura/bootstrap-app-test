@@ -179,4 +179,14 @@
       })
       .done(function () { console.log('DONE!'); });
   });
+
+  $(document).on('click', '#test3', function () {
+    automator(rootPage)
+      .action(function (root) { return root.clickOpenModal(); })
+      .action(function (dialog) { return dialog.clickClose(); })
+      .action(function (root) { return root.switchCollapseGroup(); })
+      .action('clickAt', 0)
+      .action(function (group) { return group.clickAt(1); })
+      .done(function () { console.log('DONE'); });
+  });
 })();

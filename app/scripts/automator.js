@@ -13,10 +13,7 @@ var automator = (function ($, _) { // jshint ignore:line
       return this.wrap(this.promise_.then, Automator.returnTarget(testFilter));
     },
     action: function () {
-      var args = _.toArray(arguments);
-      var name = args.shift();
-
-      return this.wrap(this.promise_.then, Automator.invokeAction(name, args));
+      return this.wrap(this.promise_.then, Automator.invokeAction.apply(null, arguments));
     },
     wrap: function (func, args) {
       var promise = this.promise_;
@@ -37,7 +34,22 @@ var automator = (function ($, _) { // jshint ignore:line
         return _.first(args);
       };
     },
-    invokeAction: function (name, args) {
+    invokeAction: function () {
+      var args = _.toArray(arguments);
+      var first = args.shift();
+
+      if (_.isFunction(first)) {
+        return Automator.invokeFunctionAction(first);
+      } else {
+        return Automator.invokeNameAction(first, args);
+      }
+    },
+    invokeFunctionAction: function(func) {
+      return function (target) {
+        return func.call(target, target);
+      };
+    },
+    invokeNameAction: function(name, args) {
       return function (target) {
         return target[name].apply(target, args);
       };
