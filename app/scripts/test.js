@@ -189,4 +189,22 @@
       .action(function (group) { return group.clickAt(1); })
       .done(function () { console.log('DONE'); });
   });
+
+  $(document).on('click', '#test4', function () {
+    automator(rootPage)
+      .action(function (root) {
+        return automator(root)
+          .action('clickOpenModal')
+          .test(function (dialog) {
+            console.log(dialog.isShown());
+          })
+          .action(function (dialog) {
+            return dialog.clickClose();
+          });
+      })
+      .action(function (root) { return root.switchCollapseGroup(); })
+      .action('clickAt', 0)
+      .action(function (group) { return group.clickAt(1); })
+      .done(function () { console.log('DONE'); });
+  });
 })();

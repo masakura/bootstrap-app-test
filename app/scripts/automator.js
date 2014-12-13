@@ -7,19 +7,19 @@ var automator = (function ($, _) { // jshint ignore:line
 
   _.extend(Automator.prototype, {
     done: function () {
-      return this.wrap(this.promise_.done, arguments);
+      return this.wrap('done', arguments);
     },
     test: function (testFilter) {
-      return this.wrap(this.promise_.then, Automator.returnTarget(testFilter));
+      return this.wrap('then', Automator.returnTarget(testFilter));
     },
     action: function () {
-      return this.wrap(this.promise_.then, Automator.invokeAction.apply(null, arguments));
+      return this.wrap('then', Automator.invokeAction.apply(null, arguments));
     },
-    wrap: function (func, args) {
+    wrap: function (name, args) {
       var promise = this.promise_;
       args = _.isArray(args) ? args : [args];
 
-      return Automator.wrap(func.apply(promise, args));
+      return Automator.wrap(promise[name].apply(promise, args));
     }
   });
 
@@ -38,11 +38,17 @@ var automator = (function ($, _) { // jshint ignore:line
       var args = _.toArray(arguments);
       var first = args.shift();
 
+      var action;
       if (_.isFunction(first)) {
-        return Automator.invokeFunctionAction(first);
+        action = Automator.invokeFunctionAction(first);
       } else {
-        return Automator.invokeNameAction(first, args);
+        action = Automator.invokeNameAction(first, args);
       }
+
+      return function (target) {
+        var result = action(target);
+        return result.promise_ ? result.promise_ : result;
+      };
     },
     invokeFunctionAction: function(func) {
       return function (target) {
