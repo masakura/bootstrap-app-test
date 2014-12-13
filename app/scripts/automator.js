@@ -15,6 +15,9 @@ var automator = (function ($, _) { // jshint ignore:line
     action: function () {
       return this.wrap('then', Automator.invokeAction.apply(null, arguments));
     },
+    scope: function () {
+      return this.action.apply(this, arguments);
+    },
     wrap: function (name, args) {
       var promise = this.promise_;
       args = _.isArray(args) ? args : [args];

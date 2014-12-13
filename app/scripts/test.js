@@ -57,8 +57,11 @@
       return new ProgressPage(this.$('#progressbar'));
     },
     clickOpenModal: function () {
+      return $(document).promiseTransition(this.clickOpenModal_());
+    },
+    clickOpenModal_: function () {
       $('#open-dialog').trigger('click');
-      return $(document).promiseTransition(this.switchModal());
+      return this.switchModal();
     },
     clickCollapse: function () {
       $('#collapse').trigger('click');
@@ -206,5 +209,19 @@
       .action('clickAt', 0)
       .action(function (group) { return group.clickAt(1); })
       .done(function () { console.log('DONE'); });
+  });
+
+
+  $(document).on('click', '#test5', function () {
+    automator(rootPage)
+      .action(function(root) { return root.clickOpenModal(); })
+      .scope(function (dialog) {
+        return automator(dialog)
+          .test(function () {
+            console.log(dialog.isShown());
+          })
+          .action('clickClose');
+      })
+      .done('DONE');
   });
 })();
