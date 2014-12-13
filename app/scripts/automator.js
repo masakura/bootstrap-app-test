@@ -47,7 +47,8 @@ var automator = (function ($, _) { // jshint ignore:line
 
       return function (target) {
         var result = action(target);
-        return result.promise_ ? result.promise_ : result;
+
+        return result.promise_ || result;
       };
     },
     invokeFunctionAction: function(func) {
