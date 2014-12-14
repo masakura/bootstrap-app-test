@@ -42,10 +42,12 @@
     };
 
     var makePageProxy = function (name) {
-      return wrap(automator.action(function (target) {
-        var result = target[name].apply(target, arguments);
-        return $(document).promiseTransition(result);
-      }));
+      return function () {
+        return wrap(automator.action(function (target) {
+          var result = target[name].apply(target, arguments);
+          return $(document).promiseTransition(result);
+        }));
+      };
     };
 
     var makeAutomatorProxy = function (name) {
@@ -53,15 +55,14 @@
         var args = _.toArray(arguments);
         var filter = args[0];
         args[0] = function () {
-          var result = filter.apply(filter, arguments).automator_;
-          return result.automator_ ? result.automator_ : result;
+          var result = filter.apply(filter, arguments);
+          return (result && result.automator_) || result;
         };
         return automator[name].apply(automator, args);
       };
     };
 
     var pageWrapper = makeWrapper(page, makePageProxy);
-console.log(pageWrapper);
     var automatorWrapper = makeWrapper(automator,
                                        makeAutomatorProxy,
                                        ['action', 'scope', 'test', 'done']);
